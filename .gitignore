@@ -1,0 +1,6 @@
+.DS_Store
+.vscode
+venv/
+*.mp4
+*.png
+__pycache__/
