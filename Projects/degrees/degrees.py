@@ -27,9 +27,8 @@ def load_data(directory):
                 "movies": set()
             }
             if row["name"].lower() not in names:
-                names[row["name"].lower()] = {row["id"]}
-            else:
-                names[row["name"].lower()].add(row["id"])
+                names[row["name"].lower()] = set()
+            names[row["name"].lower()].add(row["id"])
 
     # Load movies
     with open(f"{directory}/movies.csv", encoding="utf-8") as f:
@@ -101,7 +100,7 @@ def shortest_path(source, target):
     while True:
 
         if frontier.empty():
-            raise Exception("no solution")
+            return
         
         node = frontier.remove()
 
