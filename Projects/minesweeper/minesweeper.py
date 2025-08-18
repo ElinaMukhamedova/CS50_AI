@@ -189,7 +189,7 @@ class MinesweeperAI():
                if they can be inferred from existing knowledge
         """
         self.moves_made.add(cell)
-        self.safes.add(cell)
+        self.mark_safe(cell)
 
         new_cells = set()
         for i in range(cell[0] - 1, cell[0] + 2):
@@ -205,15 +205,31 @@ class MinesweeperAI():
         
         new_sentence = Sentence(new_cells, count)
         self.knowledge.append(new_sentence)
-        
-        for s1 in self.knowledge:
-            for s2 in self.knowledge:
-                if s1.cells > s2.cells:
-                    self.knowledge.append(Sentence(s1.cells - s2.cells, s1.count - s2.count))
 
         for sentence in self.knowledge:
-            self.mines |= sentence.known_mines()
             self.safes |= sentence.known_safes()
+            self.mines |= sentence.known_mines()
+
+        for cell in self.safes:
+            self.mark_safe(cell)
+        for cell in self.mines:
+            self.mark_mine(cell)
+        
+        new_sentences = []
+        for s1 in self.knowledge:
+            for s2 in self.knowledge:
+                if s1 != s2 and s1.cells.issuperset(s2.cells):
+                    new_sentences.append(Sentence(s1.cells.difference(s2.cells), s1.count - s2.count))
+        self.knowledge.extend(new_sentences)
+
+        for sentence in self.knowledge:
+            self.safes |= sentence.known_safes()
+            self.mines |= sentence.known_mines()
+
+        for cell in self.safes:
+            self.mark_safe(cell)
+        for cell in self.mines:
+            self.mark_mine(cell)
 
 
     def make_safe_move(self):
