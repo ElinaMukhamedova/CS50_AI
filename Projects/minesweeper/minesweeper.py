@@ -219,7 +219,8 @@ class MinesweeperAI():
         for s1 in self.knowledge:
             for s2 in self.knowledge:
                 if s1 != s2 and s1.cells.issuperset(s2.cells):
-                    new_sentences.append(Sentence(s1.cells.difference(s2.cells), s1.count - s2.count))
+                    new_sentences.append(
+                        Sentence(s1.cells.difference(s2.cells), s1.count - s2.count))
         self.knowledge.extend(new_sentences)
 
         for sentence in self.knowledge:
@@ -230,7 +231,6 @@ class MinesweeperAI():
             self.mark_safe(cell)
         for cell in self.mines:
             self.mark_mine(cell)
-
 
     def make_safe_move(self):
         """
