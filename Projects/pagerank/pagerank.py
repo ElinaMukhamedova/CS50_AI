@@ -66,7 +66,7 @@ def transition_model(corpus, current_page, damping_factor):
         probability = 1 / N
         for page in corpus:
             probabilities[page] = probability
-        return probability
+        return probabilities
     
     damping_probability = (1 - damping_factor) / N
     for page in corpus:
@@ -76,7 +76,7 @@ def transition_model(corpus, current_page, damping_factor):
     for page in linked_pages:
         probabilities[page] += principal_probability
     
-    return probability
+    return probabilities
 
 
 def sample_pagerank(corpus, damping_factor, n):
@@ -89,7 +89,25 @@ def sample_pagerank(corpus, damping_factor, n):
     PageRank values should sum to 1.
     """
     ranks = dict()
-    first_page = random.choice(list(corpus.keys()))
+    list_pages = list(corpus.keys())
+    current_page = random.choice(list_pages)
+
+    visisted_pages = []
+    for i in range(n):
+        visisted_pages.append(current_page)
+        probabilities = transition_model(corpus, current_page, damping_factor)
+        list_weights = []
+        for page in list_pages:
+            list_weights.append(probabilities[page])
+        current_page = random.choices(population=list_pages, weights=list_weights, k=1)[0]
+    
+    N = len(visisted_pages)
+    for page in list_pages:
+        number = 0
+        for occurrence in visisted_pages:
+            if occurrence == page:
+                number += 1
+        ranks[page] = number / N
 
     return ranks
 
@@ -108,7 +126,7 @@ def iterate_pagerank(corpus, damping_factor):
     damping_probability = (1 - damping_factor) / N
 
     for page in corpus:
-        dict[page] = 1 / N
+        ranks[page] = 1 / N
         if len(corpus[page]) == 0:
             corpus[page] = set()
             for descendant in corpus:
@@ -116,10 +134,19 @@ def iterate_pagerank(corpus, damping_factor):
     
     tolerance = 0.001
     converged = False
+
     while not converged:
+        converged = True
         for page in corpus:
-            previous_rank = dict[page]
-            
+            previous_rank = ranks[page]
+            sum_descendants = 0
+            for descendant in corpus:
+                if page in corpus[descendant]:
+                    sum_descendants += ranks[descendant] / len(corpus[descendant])
+            new_rank = damping_probability + damping_factor * sum_descendants
+            ranks[page] = new_rank
+            if abs(new_rank - previous_rank) > tolerance:
+                converged = False
 
     return ranks
 
