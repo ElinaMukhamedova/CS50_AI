@@ -100,9 +100,11 @@ class CrosswordCreator():
          constraints; in this case, the length of the word.)
         """
         for v in self.crossword.variables:
+            inconsistency = set()
             for x in self.domains[v]:
                 if len(x) != v.length:
-                    self.crossword.variables.remove[v]
+                    inconsistency.add(x)
+            self.domains[v].difference_update(inconsistency)
 
     def revise(self, x, y):
         """
@@ -113,7 +115,7 @@ class CrosswordCreator():
         Return True if a revision was made to the domain of `x`; return
         False if no revision was made.
         """
-        overlaps = self.crossword.overlaps[x, y]
+        overlap = self.crossword.overlaps[x, y]
         inconsistency = set()
 
         for value_x in self.domains[x]:
@@ -122,9 +124,8 @@ class CrosswordCreator():
             for value_y in self.domains[y]:
                 contradiction = False
 
-                for overlap in overlaps:
-                    if value_x[overlap[0]] != value_y[overlap[1]]:
-                        contradiction = True
+                if value_x[overlap[0]] != value_y[overlap[1]]:
+                    contradiction = True
                 
                 if not contradiction:
                     found_arc = True
