@@ -1,6 +1,7 @@
 .DS_Store
 .vscode
 venv
+gtsrb
 *.mp4
 *.png
 __pycache__/
